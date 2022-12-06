@@ -28,10 +28,9 @@ final class AdventChallengeSix extends Command
         $startOfPacketPosition = 0;
         foreach (\str_split($input) as $key => $letter) {
             $currentPacket = \substr($input, $key, 4);
-            $currentFourSplit = \str_split($currentPacket);
-            $maybeFourUnique = \array_unique(\str_split($currentPacket));
+            $maybeUnique = \array_unique(\str_split($currentPacket));
 
-            if (\count($currentFourSplit) === \count($maybeFourUnique)) {
+            if (\strlen($currentPacket) === \count($maybeUnique)) {
                 $startOfPacketPosition = ($key + 4);
                 break;
             }
@@ -40,10 +39,9 @@ final class AdventChallengeSix extends Command
         $startOfMessagePosition = 0;
         foreach (\str_split($input) as $key => $letter) {
             $currentMessage = \substr($input, $key, 14);
-            $currentFourSplit = \str_split($currentMessage);
-            $maybeFourUnique = \array_unique(\str_split($currentMessage));
+            $maybeUnique = \array_unique(\str_split($currentMessage));
 
-            if (\count($currentFourSplit) === \count($maybeFourUnique)) {
+            if (\strlen($currentMessage) === \count($maybeUnique)) {
                 $startOfMessagePosition = ($key + 14);
                 break;
             }
