@@ -6,7 +6,6 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Data\Move;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
 final class AdventChallengeFive extends Command
@@ -20,10 +19,10 @@ final class AdventChallengeFive extends Command
     public function handle(): int
     {
         if ($this->option('sample')) {
-            $input = Storage::get('advent_input_5-sample.txt');
+            $input = file_get_contents(storage_path('advent/advent_input_5-sample.txt'));
             $this->maxCrates = 3;
         } else {
-            $input = Storage::get('advent_input_5.txt');
+            $input = file_get_contents(storage_path('advent/advent_input_5.txt'));
             $this->maxCrates = 9;
         }
 

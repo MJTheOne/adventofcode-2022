@@ -16,7 +16,7 @@ final class AdventChallengeThree extends Command
 
     public function handle(): int
     {
-        $input = Storage::get('advent_input_3.txt');
+        $input = file_get_contents(storage_path('advent/advent_input_3.txt'));
 
         $start = \microtime(true);
         $data = \explode(PHP_EOL, $input);
