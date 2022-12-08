@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
@@ -35,46 +36,53 @@ final class AdventChallengeEight extends Command
         $forestHeight = \count($forest);
         $forestWidth = \count($forest[0]);
         $visibleTrees = 0;
+        $scenicScore = 0;
 
         for ($y = 0; $y < $forestHeight; $y++) {
             for ($x = 0; $x < $forestWidth; $x++) {
-                $this->markTreeVisible($x, $y, $forest, $visibleTrees);
+                $this->markTreeVisible(
+                    x: $x,
+                    y: $y,
+                    forest: $forest,
+                    visibleTrees: $visibleTrees,
+                    scenicScore: $scenicScore,
+                );
             }
         }
 
         $totalTime = (\microtime(true) - $start);
 
         $this->getOutput()->writeln('Total visible trees: ' . $visibleTrees);
+        $this->getOutput()->writeln('Highest scenic score: ' . $scenicScore);
         $this->getOutput()->writeln('Total execution time: ' . $totalTime . 's');
 
         return CommandAlias::SUCCESS;
     }
 
-    private function markTreeVisible(int $x, int $y, array $forest, int &$visibleTrees): void
-    {
+    private function markTreeVisible(
+        int $x,
+        int $y,
+        array $forest,
+        int &$visibleTrees,
+        int &$scenicScore,
+    ): void {
         if ($this->isEdge($x, $y, $forest)) {
             $visibleTrees++;
             return;
         }
 
-        if ($this->treeVisibleLeft($x, $y, $forest)) {
+        $left = $this->treeVisibleLeft($x, $y, $forest);
+        $right = $this->treeVisibleRight($x, $y, $forest);
+        $top = $this->treeVisibleTop($x, $y, $forest);
+        $bottom = $this->treeVisibleBottom($x, $y, $forest);
+
+        if ($left['bool'] || $right['bool'] || $top['bool'] || $bottom['bool']) {
             $visibleTrees++;
-            return;
         }
 
-        if ($this->treeVisibleRight($x, $y, $forest)) {
-            $visibleTrees++;
-            return;
-        }
+        $score = $left['score'] * $right['score'] * $top['score'] * $bottom['score'];
 
-        if ($this->treeVisibleTop($x, $y, $forest)) {
-            $visibleTrees++;
-            return;
-        }
-
-        if ($this->treeVisibleBottom($x, $y, $forest)) {
-            $visibleTrees++;
-        }
+        $scenicScore = \max($scenicScore, $score);
     }
 
     private function isEdge(int $x, int $y, array $forest): bool
@@ -86,47 +94,71 @@ final class AdventChallengeEight extends Command
         return false;
     }
 
-    private function treeVisibleLeft(int $x, int $y, array $forest): bool
+    #[ArrayShape(['bool' => 'bool', 'score' => 'int'])]
+    private function treeVisibleLeft(int $x, int $y, array $forest): array
     {
+        $bool = true;
+        $score = 0;
+
         for ($i = $x - 1; $i >= 0; $i--) {
+            $score++;
             if ($forest[$y][$i] >= $forest[$y][$x]) {
-                return false;
+                $bool = false;
+                break;
             }
         }
 
-        return true;
+        return ['bool' => $bool, 'score' => $score];
     }
 
-    private function treeVisibleRight(int $x, int $y, array $forest): bool
+    #[ArrayShape(['bool' => 'bool', 'score' => 'int'])]
+    private function treeVisibleRight(int $x, int $y, array $forest): array
     {
+        $bool = true;
+        $score = 0;
+
         for ($i = $x + 1; $i < \count($forest[0]); $i++) {
+            $score++;
             if ($forest[$y][$i] >= $forest[$y][$x]) {
-                return false;
+                $bool = false;
+                break;
             }
         }
 
-        return true;
+        return ['bool' => $bool, 'score' => $score];
     }
 
-    private function treeVisibleTop(int $x, int $y, array $forest): bool
+    #[ArrayShape(['bool' => 'bool', 'score' => 'int'])]
+    private function treeVisibleTop(int $x, int $y, array $forest): array
     {
+        $bool = true;
+        $score = 0;
+
         for ($i = $y - 1; $i >= 0; $i--) {
+            $score++;
             if ($forest[$i][$x] >= $forest[$y][$x]) {
-                return false;
+                $bool = false;
+                break;
             }
         }
 
-        return true;
+        return ['bool' => $bool, 'score' => $score];
     }
 
-    private function treeVisibleBottom(int $x, int $y, array $forest): bool
+    #[ArrayShape(['bool' => 'bool', 'score' => 'int'])]
+    private function treeVisibleBottom(int $x, int $y, array $forest): array
     {
+        $bool = true;
+        $score = 0;
+
         for ($i = $y + 1; $i < \count($forest); $i++) {
+            $score++;
             if ($forest[$i][$x] >= $forest[$y][$x]) {
-                return false;
+                $bool = false;
+                break;
             }
         }
 
-        return true;
+        return ['bool' => $bool, 'score' => $score];
     }
 }
