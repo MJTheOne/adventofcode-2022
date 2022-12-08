@@ -24,7 +24,7 @@ final class AdventChallengeSeven extends Command
         $start = \microtime(true);
 
         $directoryStructureData = \explode(PHP_EOL, $input);
-        \array_filter($directoryStructureData);
+        $directoryStructureData = \array_filter($directoryStructureData);
 
         $directoryListing = [];
         $curDir = '/';
